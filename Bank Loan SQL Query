@@ -1,0 +1,161 @@
+-->> BANK LOAN SQL QUERY <<---
+
+SELECT * FROM bank_loan.financial_loan1;
+
+/*---1. what is the total loan application----*/
+
+SELECT COUNT(id) AS Total_loan_application 
+FROM bank_loan.financial_loan1;
+
+/*---2. what is Month-to-date (MOD) loan application----*/
+
+SELECT COUNT(id) AS MOD_loan_Applications
+FROM bank_loan.financial_loan1
+WHERE MONTH(issue_date) = 12 and year(issue_date) = 2021;
+
+/*---3. what is Previous-Month-to-date (pMOD) loan application----*/
+
+SELECT COUNT(id) AS PMOD_loan_Applications
+ FROM bank_loan.financial_loan1
+WHERE MONTH(issue_date) = 11 and year(issue_date) = 2021;
+
+/*---4. what is total funded amount----*/
+
+SELECT SUM(loan_amount) AS Total_Funded_Amount
+ FROM bank_loan.financial_loan1;
+ 
+ /*---5. what is Month-to-date (MOD) of total funded amount----*/
+ 
+SELECT SUM(loan_amount) AS MOD_Total_Funded_Amount
+ FROM bank_loan.financial_loan1
+ WHERE MONTH(issue_date) = 12 ;
+ 
+  /*---5. what is Previous-Month-to-date (PMOD) of total funded amount----*/
+  
+  SELECT SUM(loan_amount) AS PMOD_Total_Funded_Amount
+ FROM bank_loan.financial_loan1
+ WHERE MONTH(issue_date) = 11 ;
+ 
+ /*---6. what is  total amount recevied----*/
+ 
+SELECT SUM(total_payment) AS Total_Amt_Recevied
+ FROM bank_loan.financial_loan1;
+ 
+ /*---7. what is Month-to-date (MOD) of total amount recevied----*/
+ 
+ SELECT SUM(total_payment) AS MOD_Total_Amt_Recevied
+ FROM bank_loan.financial_loan1
+ WHERE MONTH(issue_date) =12;
+
+ /*---8. what is Previous-Month-to-date (PMOD) of total amount recevied----*/
+ 
+ SELECT SUM(total_payment) AS PMOD_Total_Amt_Recevied
+ FROM bank_loan.financial_loan1
+ WHERE MONTH(issue_date) =11;
+
+/*---9. what is Average Interest Rate----*/
+
+SELECT round(avg(int_rate)*100,2) AS Avg_int_rate
+ FROM bank_loan.financial_loan1;
+
+ /*---10. what is Month-to-date (MOD) of AVG int rate----*/
+
+SELECT round(avg(int_rate)*100,2) AS MOD_Avg_int_rate
+ FROM bank_loan.financial_loan1
+ WHERE MONTH(issue_date)=12
+
+/*---11. what is Average Debt-To-Income (DTI)?---*/
+
+SELECT round(avg(dti)*100,2) AS Avg_DTI
+ FROM bank_loan.financial_loan1;
+
+/*---12. what is Month-to-date (MTD) Average Debt-To-Income (DTI)?---*/
+
+SELECT Round(AVG(dti)*100,2) AS MTD_Avg_DTI 
+FROM bank_loan.financial_loan1
+WHERE MONTH(issue_date)=12 ;
+
+/*---13. what is Previous-Month-to-date (PMTD) Average Debt-To-Income (DTI)?---*/
+
+SELECT Round(AVG(dti)*100,2) AS MTD_Avg_DTI 
+FROM bank_loan.financial_loan1
+WHERE MONTH(issue_date)=11 ;
+
+/*---14. what is the percentage of good loan ---*/
+/*--- good loan means= fully_paid and current-----*/
+
+SELECT
+	  (COUNT(CASE WHEN loan_status = 'Fully Paid' OR loan_status = 'Current'
+      THEN id END) * 100.0 ) /
+       COUNT(id) AS Good_loan_per
+      FROM bank_loan.financial_loan1;
+      
+/*---15. what is the number of good loan ---*/
+
+SELECT COUNT(id) AS number_of_good_loan
+FROM bank_loan.financial_loan1
+WHERE loan_status= 'Fully Paid' OR loan_status= 'Current' ;
+
+/*-- 16. what is total funded amount of good loan application ---*/
+
+SELECT SUM(loan_amount) AS Good_loan_funded_amt 
+FROM bank_loan.financial_loan1
+WHERE loan_status= 'Fully Paid' OR loan_status= 'Current' ;
+
+/*--17. what is total amount recevied of good loan application ---*/
+
+SELECT SUM(total_payment) AS Good_loan_recevied_amt 
+FROM bank_loan.financial_loan1
+WHERE loan_status= 'Fully Paid' OR loan_status= 'Current' ;
+
+
+/*---18. what is the percentage of bad loan ---*/
+
+SELECT
+      (COUNT(CASE WHEN loan_status = 'Charged Off'
+      THEN id END)*100)
+      /COUNT(id) AS bad_loan_perc
+FROM bank_loan.financial_loan1;
+
+/*---19. what is the number of bad loan ---*/
+
+SELECT COUNT(id) AS number_of_bad_loan
+FROM bank_loan.financial_loan1
+WHERE loan_status= 'Charged Off' ;
+
+/*--20. what is total funded amount of bad loan application ---*/
+
+SELECT SUM(loan_amount) AS bad_loan_funded_amt 
+FROM bank_loan.financial_loan1
+WHERE loan_status= 'Charged Off' ;
+
+/*--21. what is total amount recevied of bad loan application ---*/
+
+SELECT SUM(total_payment) AS bad_loan_recevied_amt 
+FROM bank_loan.financial_loan1
+WHERE loan_status= 'Charged Off' ;
+
+/*--22. what is loan status with respect to AMOUNT RECEVIED, AMOUNT FUNDED , INTEREST RATE , DTI ?--*/
+
+SELECT
+      loan_status,
+      COUNT(id) AS Loan_Count ,
+      SUM(loan_amount) AS Total_Amt_Funded ,
+      SUM(total_payment) AS Total_Amt_Rec ,
+      AVG(int_rate*100) AS Avg_Int_Rate ,
+      AVG(dti*100) AS Avg_Dti
+FROM bank_loan.financial_loan1
+GROUP BY loan_status;
+
+/*--23. what is Month-to-date(MTD) loan status with respect to AMOUNT RECEVIED, AMOUNT FUNDED , INTEREST RATE , DTI ?--*/
+
+SELECT
+      loan_status,
+      COUNT(id) AS Loan_Count ,
+      SUM(loan_amount) AS Total_Amt_Funded ,
+      SUM(total_payment) AS Total_Amt_Rec ,
+      AVG(int_rate*100) AS Avg_Int_Rate ,
+      AVG(dti*100) AS Avg_Dti
+FROM bank_loan.financial_loan1
+WHERE MONTH(issue_date) = 12
+GROUP BY loan_status;
